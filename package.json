@@ -1,0 +1,34 @@
+{
+  "type": "module",
+  "scripts": {
+    "backend-dev": "scripts/backend-dev.sh",
+    "backend-start": "NODE_ENV=production node backend/main.js",
+    "frontend-dev": "vite",
+    "frontend-build": "vite build",
+    "create-migration": "node-pg-migrate create",
+    "migrate": "node scripts/migrations.js up",
+    "migrate:down": "node scripts/migrations.js down"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.6.1",
+    "@tailwindcss/vite": "^4.0.12",
+    "@vitejs/plugin-react": "^4.3.4",
+    "base64url": "^3.0.1",
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "http-proxy-middleware": "^3.0.3",
+    "moment": "^2.30.1",
+    "node-pg-migrate": "^7.9.1",
+    "pg": "^8.14.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.2.0",
+    "tailwindcss": "^4.0.12",
+    "uuid": "^11.1.0",
+    "vite": "^6.2.1",
+    "yup": "^1.6.1"
+  }
+}
