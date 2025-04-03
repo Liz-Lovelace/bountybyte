@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import RegisterForm from './RegisterForm';
-import LoginForm from './LoginForm';
-import * as auth from '../store/authSlice';
+import RegisterForm from '../RegisterForm';
+import LoginForm from '../LoginForm';
+import * as auth from '../../store/authSlice';
 
 export default function AuthPage() {
   const dispatch = useDispatch();

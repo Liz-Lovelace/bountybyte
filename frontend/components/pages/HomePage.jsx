@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import Posts from './Posts';
-import NewPostForm from './NewPostForm';
+import Posts from '../Posts';
+import NewPostForm from '../NewPostForm';
 
 export default function HomePage() {
   const { isLoggedIn } = useSelector(state => state.auth);

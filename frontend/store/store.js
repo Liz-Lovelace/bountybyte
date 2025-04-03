@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import postsReducer from './postsSlice';
 import authReducer, { refreshAuth } from './authSlice';
 import routerReducer, { initializeHistoryListener } from './routerSlice';
+import threadReducer from './threadSlice';
 
 // Custom logger middleware
 const loggerMiddleware = store => next => action => {
@@ -16,6 +17,7 @@ export const store = configureStore({
     posts: postsReducer,
     auth: authReducer,
     router: routerReducer,
+    thread: threadReducer,
   },
   /*
   middleware: (getDefaultMiddleware) => 

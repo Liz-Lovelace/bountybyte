@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { createApiThunk } from '../standardApi.js';
 
-// Create API thunks
 export const fetchPostsThunk = createApiThunk(
   'posts/fetchPosts',
   'getPosts',
@@ -15,7 +14,7 @@ export const createPostThunk = createApiThunk(
 );
 
 const initialState = {
-  posts: [],
+  postsById: {},
   isLoading: false,
   isCreating: false,
   error: null,
@@ -34,7 +33,10 @@ export const postsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchPostsThunk.happyPath, (state, action) => {
-        state.posts = action.payload;
+        state.postsById = {};
+        action.payload.forEach(post => {
+          state.postsById[post.id] = post;
+        });
         state.isLoading = false;
       })
       .addCase(fetchPostsThunk.validation, (state, action) => {
@@ -55,7 +57,8 @@ export const postsSlice = createSlice({
         state.createError = null;
       })
       .addCase(createPostThunk.happyPath, (state, action) => {
-        state.posts = [action.payload, ...state.posts];
+        const newPost = action.payload;
+        state.postsById[newPost.id] = newPost;
         state.isCreating = false;
       })
       .addCase(createPostThunk.validation, (state, action) => {
@@ -71,12 +74,5 @@ export const postsSlice = createSlice({
       });
   }
 });
-
-// Selectors
-export const selectAllPosts = (state) => state.posts.posts;
-export const selectPostsLoading = (state) => state.posts.isLoading;
-export const selectPostsError = (state) => state.posts.error;
-export const selectPostCreating = (state) => state.posts.isCreating;
-export const selectCreateError = (state) => state.posts.createError;
 
 export default postsSlice.reducer; 

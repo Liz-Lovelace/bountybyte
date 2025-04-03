@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createPostThunk, selectPostCreating, selectCreateError } from '../store/postsSlice';
+import { createPostThunk } from '../store/postsSlice';
 
 export default function NewPostForm() {
   const [title, setTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
   const dispatch = useDispatch();
-  const isCreating = useSelector(selectPostCreating);
-  const error = useSelector(selectCreateError);
+  const isCreating = useSelector(state => state.posts.isCreating);
+  const error = useSelector(state => state.posts.createError);
 
   const handleSubmit = (e) => {
     e.preventDefault();
