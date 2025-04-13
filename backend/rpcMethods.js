@@ -3,6 +3,7 @@ import { callerIdFromCookies, cookieResponse, happyPathResponse, validationRespo
 import * as posts from './modules/posts.js';
 import * as authentication from './modules/authentication.js';
 import dotenv from 'dotenv';
+import * as replies from './modules/replies.js';
 
 dotenv.config();
 
@@ -93,4 +94,45 @@ export async function login({ email, password }) {
       sameSite: 'strict'
     }
   });
+}
+
+export async function getReplies() {
+  const allReplies = await replies.getAllReplies();
+  let responseReplies = allReplies.map(reply => ({
+    id: reply.id,
+    bodyText: reply.body_text,
+    createdAt: reply.created_at,
+    userId: reply.user_id,
+    postId: reply.post_id,
+    parentReplyId: reply.parent_reply_id
+  }));
+  return happyPathResponse(responseReplies);
+}
+
+export async function createReply({ postId, parentReplyId, bodyText, cookies }) {
+  const callerId = callerIdFromCookies(cookies);
+  if (!callerId) {
+    throw new Error('Authentication required');
+  }
+
+  assert(postId, 'Post ID is required');
+  assert(bodyText && bodyText.trim(), 'Reply text is required');
+  
+  const newReply = await replies.createReply({
+    postId,
+    parentReplyId: parentReplyId || null,
+    userId: callerId,
+    bodyText: bodyText.trim()
+  });
+
+  let responseReply = {
+    id: newReply.id,
+    bodyText: newReply.body_text,
+    createdAt: newReply.created_at,
+    userId: newReply.user_id,
+    postId: newReply.post_id,
+    parentReplyId: newReply.parent_reply_id
+  }
+  
+  return happyPathResponse(responseReply);
 }

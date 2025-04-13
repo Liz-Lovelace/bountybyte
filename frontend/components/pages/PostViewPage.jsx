@@ -3,19 +3,21 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchPostsThunk } from '../../store/postsSlice';
 import ReplyThread from '../reply-thread/ReplyThread';
 import ComposeReplyForm from '../reply-thread/ComposeReplyForm';
+import { fetchRepliesThunk } from '../../store/threadSlice';
 
 export default function PostViewPage() {
   const dispatch = useDispatch();
   const currentPath = useSelector(state => state.router.currentPath);
   const postsById = useSelector(state => state.posts.postsById);
   const isLoading = useSelector(state => state.posts.isLoading);
-  const error = useSelector(state => state.posts.error);
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
 
   const postId = currentPath.split('/bounty/')[1];
   const post = postsById[postId];
 
   useEffect(() => {
     dispatch(fetchPostsThunk());
+    dispatch(fetchRepliesThunk());
   }, [dispatch]);
 
   const formatDate = (timestamp) => {
@@ -24,10 +26,6 @@ export default function PostViewPage() {
 
   if (isLoading) {
     return <div className="p-4 text-center text-gray-600">Loading post...</div>;
-  }
-
-  if (error) {
-    return <div className="p-4 text-center text-red-500">Error: {error}</div>;
   }
 
   if (!post) {
@@ -47,8 +45,8 @@ export default function PostViewPage() {
       </div>
 
       <div className="max-w-2xl mx-auto">
-        <ComposeReplyForm />
-        <ReplyThread />
+        {isLoggedIn && <ComposeReplyForm postId={postId} parentReplyId={null} />}
+        <ReplyThread postId={postId} />
       </div>
     </div>
   );

@@ -3,14 +3,15 @@ import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
-  selectComposeReplyForm, 
   updateComposeReplyForm,
-  toggleMarkdownPreview
+  toggleMarkdownPreview,
+  createReplyThunk,
 } from '../../store/threadSlice';
 
-export default function ComposeReplyForm() {
+export default function ComposeReplyForm({ postId, parentReplyId }) {
   const dispatch = useDispatch();
-  const { bodyText, isPreviewingMarkdown } = useSelector(selectComposeReplyForm);
+  const formState = useSelector(state => state.thread.replyFormsById[parentReplyId]);
+  const { bodyText, isPreviewingMarkdown, isSubmitting } = formState;
   const textareaRef = useRef(null);
 
   const adjustHeight = () => {
@@ -25,6 +26,14 @@ export default function ComposeReplyForm() {
     adjustHeight();
   }, [bodyText]);
 
+  const handleSubmit = async () => {
+    await dispatch(createReplyThunk({ 
+      postId, 
+      parentReplyId, 
+      bodyText: bodyText.trim() 
+    }));
+  };
+
   return (
     <div className="mb-6">
       <div className="border rounded-lg">
@@ -32,13 +41,13 @@ export default function ComposeReplyForm() {
         <div className="flex border-b bg-gray-50">
           <button
             className={`px-4 py-2 ${!isPreviewingMarkdown ? 'border-b-2 border-blue-500' : ''}`}
-            onClick={() => dispatch(toggleMarkdownPreview())}
+            onClick={() => dispatch(toggleMarkdownPreview(parentReplyId))}
           >
             Write
           </button>
           <button
             className={`px-4 py-2 ${isPreviewingMarkdown ? 'border-b-2 border-blue-500' : ''}`}
-            onClick={() => dispatch(toggleMarkdownPreview())}
+            onClick={() => dispatch(toggleMarkdownPreview(parentReplyId))}
           >
             Preview
           </button>
@@ -52,20 +61,29 @@ export default function ComposeReplyForm() {
               className="w-full min-h-[200px] p-2 border rounded resize-none overflow-hidden"
               placeholder="Add your comment here..."
               value={bodyText}
-              onChange={(e) => dispatch(updateComposeReplyForm(e.target.value))}
+              onChange={(e) => dispatch(updateComposeReplyForm(parentReplyId, e.target.value))}
             />
           ) : (
             <div className="prose prose-sm max-w-none min-h-[200px] p-2">
-              <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-                {bodyText}
-              </ReactMarkdown>
+              <div className="preserve-newlines">
+                <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
+                  {bodyText}
+                </ReactMarkdown>
+              </div>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2 border-t bg-gray-50 text-sm text-gray-600">
-          <span>📝 Markdown is supported</span>
+        <div className="px-4 py-2 border-t bg-gray-50 flex justify-between items-center">
+          <span className="text-sm text-gray-600">📝 Markdown is supported</span>
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+            onClick={handleSubmit}
+            disabled={isSubmitting || !bodyText.trim()}
+          >
+            {isSubmitting ? 'Posting...' : 'Post Reply'}
+          </button>
         </div>
       </div>
     </div>

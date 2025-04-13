@@ -25,7 +25,7 @@ export default function Posts() {
     return <div className="p-4 text-center text-red-500">Error: {error}</div>;
   }
 
-  const posts = Object.values(postsById);
+  const posts = Object.values(postsById).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   return (
     <div className="max-w-2xl mx-auto p-4 bg-white rounded-lg shadow">
