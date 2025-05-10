@@ -119,7 +119,7 @@ export function callerIdFromJWT(jwt) {
 }
 
 export async function getUserById(userId) {
-  const query = 'SELECT id, username, email FROM users WHERE id = $1';
+  const query = 'SELECT id, username, email, created_at, bio, tech_stack FROM users WHERE id = $1';
   const result = await db.query(query, [userId]);
   const user = result.rows[0];
   
@@ -130,7 +130,10 @@ export async function getUserById(userId) {
   return {
     id: user.id,
     username: user.username,
-    email: user.email
+    email: user.email,
+    created_at: user.created_at,
+    bio: user.bio,
+    tech_stack: user.tech_stack
   };
 }
 
@@ -146,4 +149,25 @@ export async function getUserByEmail(email) {
     username: user.username,
     email: user.email
   };
+}
+
+const profileUpdateSchema = yup.object({
+  bio: yup.string()
+    .required('Bio is required')
+    .max(3000, 'Bio must be at most 3000 characters'),
+  techStack: yup.string()
+    .required('Tech stack is required')
+    .max(1000, 'Tech stack must be at most 1000 characters')
+});
+
+export async function validateProfileUpdate({ bio, techStack }) {
+  return await validateWithYup(profileUpdateSchema, { bio, techStack });
+}
+
+export async function updateUserProfile({ userId, bio, techStack }) {
+  await db.query(
+    'UPDATE users SET bio = $1, tech_stack = $2 WHERE id = $3',
+    [bio, techStack, userId]
+  );
+  return getUserById(userId);
 }

@@ -9,7 +9,6 @@ const routerSlice = createSlice({
   initialState,
   reducers: {
     navigateToPath: (state, action) => {
-      console.log('navigateToPath', action.payload);
       state.currentPath = action.payload;
     }
   }

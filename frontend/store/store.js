@@ -3,6 +3,7 @@ import postsReducer from './postsSlice';
 import authReducer, { refreshAuth } from './authSlice';
 import routerReducer, { initializeHistoryListener } from './routerSlice';
 import threadReducer from './threadSlice';
+import usersReducer from './usersSlice';
 
 // Custom logger middleware
 const loggerMiddleware = store => next => action => {
@@ -18,6 +19,7 @@ export const store = configureStore({
     auth: authReducer,
     router: routerReducer,
     thread: threadReducer,
+    users: usersReducer,
   },
   /*
   middleware: (getDefaultMiddleware) => 

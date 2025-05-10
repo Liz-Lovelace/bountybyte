@@ -41,4 +41,4 @@ export async function createReply({ postId, parentReplyId, userId, bodyText }) {
   
   const result = await db.query(query, [postId, parentReplyId, userId, bodyText]);
   return result.rows[0];
-} 
+}

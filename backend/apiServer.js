@@ -8,6 +8,8 @@ import * as rpcMethods from './rpcMethods.js';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { sleep } from './lib/utils.js';
 import { happyPathResponse, catastrophicError, ErrorText, SET_COOKIE_SYMBOL, assert } from './lib/rpcUtils.js';
+import * as posts from './modules/posts.js';
+import compression from 'compression';
 dotenv.config();
 
 export function startApiServer() {
@@ -16,12 +18,14 @@ export function startApiServer() {
   
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   
+  app.use(compression());
+
   app.use(cors({
     origin: process.env.CURRENT_HOST,
-    // credentials: true // remove if everything works after a deploy
   }));
 
-  app.use(express.json());
+  app.use(express.json({ limit: '100mb' }));
+  app.use(express.urlencoded({ limit: '100mb', extended: true }));
   app.use(cookieParser());
 
   app.post('/rpc', async (req, res) => {
@@ -54,6 +58,28 @@ export function startApiServer() {
         return res.status(500).json(catastrophicError(error.message));
       } 
       return res.status(500).json(catastrophicError('Something went wrong'));
+    }
+  });
+
+  // Add the new endpoint for project files
+  app.get('/projectfiles/:postId', async (req, res) => {
+    try {
+      const postId = req.params.postId;
+      const projectFiles = await posts.getProjectFiles(postId);
+      
+      if (!projectFiles) {
+        return res.status(404).send('Project files not found');
+      }
+      
+      // Set appropriate headers for binary data
+      res.set('Content-Type', 'application/zip');
+      res.set('Content-Disposition', `attachment; filename="project-files-${postId}.zip"`);
+      
+      // Send the binary data
+      res.send(projectFiles);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error retrieving project files');
     }
   });
 

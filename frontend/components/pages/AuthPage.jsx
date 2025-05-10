@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import RegisterForm from '../RegisterForm';
 import LoginForm from '../LoginForm';
 import * as auth from '../../store/authSlice';
-
+import Link from '../core/Link';
 export default function AuthPage() {
   const dispatch = useDispatch();
   const { isAuthLoading, isLoggedIn, me } = useSelector(state => state.auth);
@@ -31,6 +31,7 @@ export default function AuthPage() {
             Log Out
           </button>
         </div>
+        <Link href={`/user/${me.id}`} className="text-blue-500 underline hover:text-blue-700">View your profile</Link>
       </div>
     );
   }

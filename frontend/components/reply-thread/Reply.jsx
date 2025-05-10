@@ -4,6 +4,7 @@ import rehypeHighlight from 'rehype-highlight';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleBodyCollapse, toggleReplyForm } from '../../store/threadSlice';
 import ComposeReplyForm from './ComposeReplyForm';
+import Link from '../core/Link';
 
 const COLLAPSED_HEIGHT = 100; // 20 * 4 
 
@@ -15,6 +16,7 @@ export default function Reply({ replyId }) {
   const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
   const contentRef = useRef(null);
   const [showCollapseButton, setShowCollapseButton] = useState(false);
+  const usersById = useSelector(state => state.users.usersById);
 
   useEffect(() => {
     if (contentRef.current) {
@@ -36,7 +38,9 @@ export default function Reply({ replyId }) {
       <div className="my-2 bg-gray-100 rounded-lg">
         <div className="flex gap-4 p-2">
           <div className="text-sm text-gray-600 mb-1">
-            User: {reply.userId}
+            {usersById[reply.userId] ? (
+              <Link href={`/user/${reply.userId}`} className="text-blue-500 underline hover:text-blue-700">{usersById[reply.userId].username}</Link>
+            ) : 'Unknown'}
           </div>
           <span className="text-xs text-gray-500 mt-1">
             {new Date(reply.createdAt).toLocaleString()}
@@ -53,7 +57,7 @@ export default function Reply({ replyId }) {
           <div className="preserve-newlines">
             <ReactMarkdown 
               rehypePlugins={[rehypeHighlight]}
-          >
+            >
               {reply.bodyText}
             </ReactMarkdown>
           </div>

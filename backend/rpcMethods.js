@@ -12,13 +12,23 @@ export async function getPosts() {
   return happyPathResponse(allPosts);
 }
 
-export async function createPost({ title, taskDescription }) {
+export async function createPost({ title, taskDescription, projectFiles, cookies }) {
+  const callerId = callerIdFromCookies(cookies);
+  assert(callerId, 'Authentication required');
   assert(title && title.trim(), 'Title is required');
   assert(taskDescription && taskDescription.trim(), 'Task description is required');
   
+  // Convert base64 to Buffer if projectFiles exists
+  let projectFilesBuffer = null;
+  if (projectFiles) {
+    projectFilesBuffer = Buffer.from(projectFiles, 'base64');
+  }
+  
   const newPost = await posts.createPost(
     title.trim(),
-    taskDescription.trim()
+    taskDescription.trim(),
+    projectFilesBuffer,
+    callerId
   );
   
   return happyPathResponse(newPost);
@@ -131,8 +141,65 @@ export async function createReply({ postId, parentReplyId, bodyText, cookies }) 
     createdAt: newReply.created_at,
     userId: newReply.user_id,
     postId: newReply.post_id,
-    parentReplyId: newReply.parent_reply_id
+    parentReplyId: newReply.parent_reply_id,
+    authorId: newReply.author_id
   }
   
   return happyPathResponse(responseReply);
+}
+
+export async function getUser({ userId }) {
+  const user = await authentication.getUserById(userId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+  // Only return id, username, created_at, bio, tech_stack
+  return happyPathResponse({
+    id: user.id,
+    username: user.username,
+    created_at: user.created_at,
+    bio: user.bio,
+    tech_stack: user.tech_stack
+  });
+}
+
+export async function updateUserProfile({ bio, techStack, cookies }) {
+  const callerId = callerIdFromCookies(cookies);
+  assert(callerId, 'Not authenticated');
+
+  // Validate using the module
+  const validation = await authentication.validateProfileUpdate({ bio, techStack });
+  if (!validation.success) {
+    return validationResponse(validation.errors);
+  }
+
+  // Use the authentication module for updating
+  const user = await authentication.updateUserProfile({
+    userId: callerId,
+    bio,
+    techStack
+  });
+  return happyPathResponse(user);
+}
+
+export async function getUsersRelatedToPost({ postId }) {
+  const allPosts = await posts.getAllPosts();
+  const post = allPosts.find(p => p.id === postId);
+  if (!post) return happyPathResponse([]);
+
+  const allReplies = await replies.getAllReplies();
+  const repliesForPost = allReplies.filter(r => r.post_id === postId);
+
+  const userIds = new Set();
+  if (post.author_id) userIds.add(post.author_id);
+  for (const reply of repliesForPost) {
+    if (reply.user_id) userIds.add(reply.user_id);
+  }
+
+  const users = [];
+  for (const userId of userIds) {
+    const user = await authentication.getUserById(userId);
+    if (user) users.push(user);
+  }
+  return happyPathResponse(users);
 }

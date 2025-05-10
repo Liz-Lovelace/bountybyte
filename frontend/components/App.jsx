@@ -4,6 +4,8 @@ import NavBar from './NavBar';
 import HomePage from './pages/HomePage';
 import AuthPage from './pages/AuthPage';
 import PostViewPage from './pages/PostViewPage';
+import ProfileViewPage from './pages/ProfileViewPage';
+import EditMyProfile from './pages/EditMyProfile';
 
 export default function App() {
   const currentPath = useSelector(state => state.router.currentPath);
@@ -12,6 +14,8 @@ export default function App() {
     <div>
       <NavBar />
       {currentPath === '/login' ? <AuthPage /> : 
+       currentPath === '/editMyProfile' ? <EditMyProfile /> :
+       currentPath.startsWith('/user') ? <ProfileViewPage /> :
        currentPath.startsWith('/bounty') ? <PostViewPage /> : 
        <HomePage />}
     </div>
