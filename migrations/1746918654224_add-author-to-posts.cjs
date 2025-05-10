@@ -1,6 +1,6 @@
 module.exports.up = async function(pgm) {
   // 1. Add the column as nullable first
-  await pgm.sql(`
+  await pgm.db.query(`
     ALTER TABLE posts
     ADD COLUMN author_id UUID
       REFERENCES users(id)
@@ -21,14 +21,14 @@ module.exports.up = async function(pgm) {
   }
 
   // 5. Now set NOT NULL constraint
-  await pgm.sql(`
+  await pgm.db.query(`
     ALTER TABLE posts
     ALTER COLUMN author_id SET NOT NULL
   `);
 };
 
 module.exports.down = async function(pgm) {
-  await pgm.sql(`
+  await pgm.db.query(`
     ALTER TABLE posts
     DROP COLUMN IF EXISTS author_id
   `);
