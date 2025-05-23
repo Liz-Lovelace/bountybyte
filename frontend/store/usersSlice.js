@@ -10,7 +10,7 @@ export const fetchUserThunk = createApiThunk(
 export const updateProfileThunk = createApiThunk(
   'users/updateProfile',
   'updateUserProfile',
-  { bio: '', techStack: '' }
+  { bio: '', techStack: [] }
 );
 
 export const fetchUsersRelatedToPostThunk = createApiThunk(
@@ -25,7 +25,7 @@ const initialState = {
   isUpdating: false,
   editForm: {
     bio: '',
-    techStack: ''
+    techStack: []
   },
   editFormValidation: {
     fields: {

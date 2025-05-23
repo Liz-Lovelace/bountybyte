@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchUserThunk } from '../../store/usersSlice';
 import Link from '../core/Link';
+import TechPill from '../TechPill';
 
 function timeAgo(dateString) {
   const now = new Date();
@@ -66,20 +67,26 @@ export default function ProfileViewPage() {
             </Link>
           </div>
         )}
-        <h1 className="text-2xl font-bold mb-4">{user.username}</h1>
-        <div className="mb-2 text-gray-500">{timeAgo(user.created_at)}</div>
+        <h1 className="text-2xl font-bold mb-8">{user.username}</h1>
         {user.bio && (
-          <div className="mb-2">
-            <div className="font-semibold">Bio:</div>
-            <div>{user.bio}</div>
+          <div className="mb-8">
+            <div className="font-semibold mb-2">Bio:</div>
+            <div>{user.bio.split('\n').map((line, i) => (
+              <div key={i}>{line}</div>
+            ))}</div>
           </div>
         )}
         {user.tech_stack && (
-          <div className="mb-2">
-            <div className="font-semibold">Tech Stack:</div>
-            <div>{user.tech_stack}</div>
+          <div className="mb-8">
+            <div className="font-semibold mb-2">Tech Stack:</div>
+            <div className="flex flex-wrap gap-2">
+              {user.tech_stack.map((tech) => (
+                <TechPill key={tech} iconName={tech} />
+              ))}
+            </div>
           </div>
         )}
+        <div className="mb-2 text-gray-500">{timeAgo(user.created_at)}</div>
       </div>
     </div>
   );

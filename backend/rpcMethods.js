@@ -12,11 +12,15 @@ export async function getPosts() {
   return happyPathResponse(allPosts);
 }
 
-export async function createPost({ title, taskDescription, projectFiles, cookies }) {
+export async function createPost({ title, taskDescription, projectFiles, techStack, cookies }) {
   const callerId = callerIdFromCookies(cookies);
   assert(callerId, 'Authentication required');
   assert(title && title.trim(), 'Title is required');
   assert(taskDescription && taskDescription.trim(), 'Task description is required');
+  assert(Array.isArray(techStack), 'Tech stack must be an array');
+  assert(techStack.length <= 20, 'Tech stack cannot have more than 20 items');
+  assert(techStack.every(item => item.trim() !== ''), 'Tech stack cannot have empty strings');
+  assert(new Set(techStack).size === techStack.length, 'Tech stack cannot have duplicate items');
   
   // Convert base64 to Buffer if projectFiles exists
   let projectFilesBuffer = null;
@@ -28,7 +32,8 @@ export async function createPost({ title, taskDescription, projectFiles, cookies
     title.trim(),
     taskDescription.trim(),
     projectFilesBuffer,
-    callerId
+    callerId,
+    techStack
   );
   
   return happyPathResponse(newPost);

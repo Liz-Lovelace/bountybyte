@@ -6,6 +6,7 @@ import ComposeReplyForm from '../reply-thread/ComposeReplyForm';
 import { fetchRepliesThunk } from '../../store/threadSlice';
 import { fetchUsersRelatedToPostThunk } from '../../store/usersSlice';
 import Link from '../core/Link';
+import TechPill from '../TechPill';
 
 export default function PostViewPage() {
   const dispatch = useDispatch();
@@ -45,6 +46,15 @@ export default function PostViewPage() {
         <div className="prose mb-4">
           <p className="text-gray-800">{post.task_description}</p>
         </div>
+        
+        {post.tech_stack && post.tech_stack.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {post.tech_stack.map((tech) => (
+              <TechPill key={tech} iconName={tech} />
+            ))}
+          </div>
+        )}
+
         <div className="text-sm text-gray-500 mb-4">
           {post.created_at && <span>Posted: {formatDate(post.created_at)}</span>}
         </div>
@@ -64,8 +74,8 @@ export default function PostViewPage() {
           </div>
         )}
 
-        <div>
-          {author ? (
+        <div className="mt-4">
+          Posted by: {author ? (
             <Link href={`/user/${author.id}`} className="text-blue-500 underline hover:text-blue-700">{author.username}</Link>
           ) : (
             <span>Unknown</span>

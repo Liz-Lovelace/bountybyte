@@ -43,7 +43,9 @@ const initialState = {
   me: {
     username: null,
     email: null,
-    id: null
+    id: null,
+    bio: null,
+    tech_stack: []
   },
   isRegistering: false,
   registerFormValidation: {

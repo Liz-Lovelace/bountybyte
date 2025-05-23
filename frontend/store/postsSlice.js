@@ -10,7 +10,7 @@ export const fetchPostsThunk = createApiThunk(
 export const createPostThunk = createApiThunk(
   'posts/createPost',
   'createPost',
-  { title: '', taskDescription: '', projectFiles: '' }
+  { title: '', taskDescription: '', projectFiles: '', techStack: [] }
 );
 
 const initialState = {

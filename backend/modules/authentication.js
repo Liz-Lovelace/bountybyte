@@ -155,9 +155,16 @@ const profileUpdateSchema = yup.object({
   bio: yup.string()
     .required('Bio is required')
     .max(3000, 'Bio must be at most 3000 characters'),
-  techStack: yup.string()
+  techStack: yup.array()
+    .of(yup.string().required())
     .required('Tech stack is required')
-    .max(1000, 'Tech stack must be at most 1000 characters')
+    .max(20, 'Tech stack cannot have more than 20 items')
+    .test('unique-items', 'Tech stack cannot have duplicate items', 
+      (value) => value ? new Set(value).size === value.length : true
+    )
+    .test('empty-str-items', 'Tech stack cannot have empty strings', 
+      (value) => value ? value.every(item => item.trim() !== '') : true
+    )
 });
 
 export async function validateProfileUpdate({ bio, techStack }) {

@@ -1,23 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { deviconIcons } from '../../listOfDevIcons.js';
-
-function IconPill({iconName}) {
-  return (
-    <div className="w-fit inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full">
-      <img className="w-6 h-6" src={'/devicon/' + deviconIcons[iconName]} alt={iconName} />
-      <p>{iconName}</p>
-    </div>
-  );
-}
+import TechStackInputSection from '../form-primitives/TechStackInputSection.jsx';
 
 export default function TestDevIconsPage() {
+  const [selectedTechs, setSelectedTechs] = useState([
+    'react', 'typescript', 'nodejs' // some initial values
+  ]);
+
   return (
-    <div>
-      <h1>Dev Icons:</h1>
-      <div className="max-w-4xl mx-auto flex flex-wrap gap-2">
-        {Object.keys(deviconIcons).map((iconName) => (
-          <IconPill key={iconName} iconName={iconName} />
-        ))}
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Tech Stack Editor</h1>
+      <TechStackInputSection 
+        techIds={selectedTechs}
+        updateTechIds={setSelectedTechs}
+      />
+      
+      <div className="mt-8 p-4 bg-gray-100 rounded">
+        <h2 className="text-lg font-semibold mb-2">Current Selection:</h2>
+        <pre className="font-mono">
+          {JSON.stringify(selectedTechs, null, 2)}
+        </pre>
       </div>
     </div>
   );

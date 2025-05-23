@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchPostsThunk } from '../store/postsSlice';
 import Link from './core/Link';
+import TechPill from './TechPill';
 
 export default function Posts() {
   const dispatch = useDispatch();
@@ -45,6 +46,13 @@ export default function Posts() {
               <div className="prose mb-2">
                 <p className="text-gray-800">{post.task_description}</p>
               </div>
+              {post.tech_stack && post.tech_stack.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3 mb-3">
+                  {post.tech_stack.map((tech) => (
+                    <TechPill key={tech} iconName={tech} />
+                  ))}
+                </div>
+              )}
               <div className="text-xs text-gray-500 mt-3">
                 {post.created_at && <span>Posted: {formatDate(post.created_at)}</span>}
               </div>

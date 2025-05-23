@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createPostThunk } from '../store/postsSlice';
 import UploadFolder from './UploadFolder';
+import TechStackInputSection from './form-primitives/TechStackInputSection';
 
 export default function NewPostForm() {
   const [title, setTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
   const [projectFiles, setProjectFiles] = useState(null);
+  const [techStack, setTechStack] = useState([]);
   const [isCompressingFiles, setIsCompressingFiles] = useState(false);
   const dispatch = useDispatch();
   const isCreating = useSelector(state => state.posts.isCreating);
@@ -19,13 +21,15 @@ export default function NewPostForm() {
       dispatch(createPostThunk({ 
         title: title.trim(), 
         taskDescription: taskDescription.trim(),
-        projectFiles: projectFiles ? projectFiles.zipBase64 : null
+        projectFiles: projectFiles ? projectFiles.zipBase64 : null,
+        techStack
       }));
       
       // Clear the form after submission
       setTitle('');
       setTaskDescription('');
       setProjectFiles(null);
+      setTechStack([]);
     }
   };
 
@@ -76,6 +80,16 @@ export default function NewPostForm() {
             rows="4"
             placeholder="Describe the task..."
             required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-700 font-medium mb-2">
+            Tech Stack
+          </label>
+          <TechStackInputSection 
+            techIds={techStack}
+            updateTechIds={setTechStack}
           />
         </div>
         
