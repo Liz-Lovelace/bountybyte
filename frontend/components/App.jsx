@@ -6,7 +6,8 @@ import AuthPage from './pages/AuthPage';
 import PostViewPage from './pages/PostViewPage';
 import ProfileViewPage from './pages/ProfileViewPage';
 import EditMyProfile from './pages/EditMyProfile';
-import TestDevIconsPage from './pages/TestDevIconsPage';
+import EditPostPage from './pages/EditPostPage';
+
 export default function App() {
   const currentPath = useSelector(state => state.router.currentPath);
 
@@ -15,9 +16,9 @@ export default function App() {
       <NavBar />
       {currentPath === '/login' ? <AuthPage /> : 
        currentPath === '/editMyProfile' ? <EditMyProfile /> :
-       currentPath === '/testDevIcons' ? <TestDevIconsPage /> :
        currentPath.startsWith('/user') ? <ProfileViewPage /> :
-       currentPath.startsWith('/bounty') ? <PostViewPage /> : 
+       currentPath.startsWith('/bounty') ? <PostViewPage /> :
+       currentPath === '/newPost' || currentPath.startsWith('/editPost/') ? <EditPostPage /> :
        <HomePage />}
     </div>
   );

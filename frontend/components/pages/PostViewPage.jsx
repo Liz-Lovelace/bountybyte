@@ -15,6 +15,7 @@ export default function PostViewPage() {
   const usersById = useSelector(state => state.users.usersById);
   const isLoading = useSelector(state => state.posts.isLoading);
   const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+  const me = useSelector(state => state.auth.me);
 
   const postId = currentPath.split('/bounty/')[1];
   const post = postsById[postId];
@@ -37,12 +38,24 @@ export default function PostViewPage() {
     return <div className="p-4 text-center text-red-500">Post not found</div>;
   }
 
+
   const author = usersById[post.author_id];
 
   return (
     <div className="container mx-auto p-4">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6 mb-8">
-        <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
+        <div className="flex justify-between items-start mb-4">
+          <h1 className="text-3xl font-bold">{post.title}</h1>
+          {isLoggedIn && author && me && me.id === author.id && (
+            <Link
+              href={`/editPost/${post.id}`}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-4"
+            >
+              Edit Post
+            </Link>
+          )}
+        </div>
+
         <div className="prose mb-4">
           <p className="text-gray-800">{post.task_description}</p>
         </div>

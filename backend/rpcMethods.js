@@ -15,12 +15,11 @@ export async function getPosts() {
 export async function createPost({ title, taskDescription, projectFiles, techStack, cookies }) {
   const callerId = callerIdFromCookies(cookies);
   assert(callerId, 'Authentication required');
-  assert(title && title.trim(), 'Title is required');
-  assert(taskDescription && taskDescription.trim(), 'Task description is required');
-  assert(Array.isArray(techStack), 'Tech stack must be an array');
-  assert(techStack.length <= 20, 'Tech stack cannot have more than 20 items');
-  assert(techStack.every(item => item.trim() !== ''), 'Tech stack cannot have empty strings');
-  assert(new Set(techStack).size === techStack.length, 'Tech stack cannot have duplicate items');
+
+  const validation = await posts.validatePost({ title, taskDescription, techStack });
+  if (!validation.success) {
+    return validationResponse(validation.errors);
+  }
   
   // Convert base64 to Buffer if projectFiles exists
   let projectFilesBuffer = null;
@@ -207,4 +206,35 @@ export async function getUsersRelatedToPost({ postId }) {
     if (user) users.push(user);
   }
   return happyPathResponse(users);
+}
+
+export async function updatePost({ postId, title, taskDescription, projectFiles, techStack, removeExistingFiles, cookies }) {
+  const callerId = callerIdFromCookies(cookies);
+  assert(callerId, 'Authentication required');
+  assert(postId, 'Post ID is required');
+  
+  const validation = await posts.validatePost({ title, taskDescription, techStack });
+  if (!validation.success) {
+    return validationResponse(validation.errors);
+  }
+  
+  const post = (await posts.getAllPosts()).find(p => p.id === postId);
+  assert(post, 'Post not found');
+  assert(post.author_id === callerId, 'Not authorized to edit this post');
+  
+  let projectFilesBuffer = undefined;
+  if (projectFiles) {
+    projectFilesBuffer = Buffer.from(projectFiles, 'base64');
+  }
+  
+  const updatedPost = await posts.updatePost(
+    postId,
+    title.trim(),
+    taskDescription.trim(),
+    projectFilesBuffer,
+    techStack,
+    removeExistingFiles
+  );
+  
+  return happyPathResponse(updatedPost);
 }
